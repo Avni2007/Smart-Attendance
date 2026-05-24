@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Attendance Dashboard</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body {
+
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+            text-align: center;
+
+            background: linear-gradient(135deg, #081b3a, #102a5c);
+        }
+
+        /* HEADER */
+        .title {
+
+            margin-top: 25px;
+            font-size: 48px;
+            font-weight: bold;
+            position: relative;
+            z-index: 10;
+        }
+
+        .subtitle {
+
+            margin-top: 10px;
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        /* CARD */
+        .container {
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            margin-top: 35px;
+            padding: 20px;
+
+            position: relative;
+            z-index: 5;
+        }
+
+        .card {
+
+            width: 760px;
+            max-width: 95%;
+
+            background: rgba(255,255,255,0.95);
+
+            border-radius: 18px;
+
+            padding: 25px;
+
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.4);
+
+            color: black;
+
+            backdrop-filter: blur(8px);
+        }
+
+        /* LIVE TEXT */
+        .live-box {
+
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .live {
+
+            color: red;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            50%{
+                opacity:0;
+            }
+        }
+
+        /* VIDEO */
+        .video-container {
+
+            position: relative;
+
+            width: 100%;
+            max-width: 700px;
+
+            margin: auto;
+        }
+
+        .video-container img {
+
+            width: 100%;
+            border-radius: 12px;
+            border: 3px solid #dcdcdc;
+            background: #f0f0f0;
+        }
+
+        /* LOADING */
+        .loading {
+
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            color: #0a1f44;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* STATUS */
+        .status {
+
+            margin-top: 18px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #0a1f44;
+        }
+
+        /* POPUP */
+        #popup {
+
+            opacity: 0;
+
+            position: fixed;
+
+            top: 20%;
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            background: #0a1f44;
+
+            color: white;
+
+            padding: 20px 35px;
+
+            border-radius: 12px;
+
+            font-size: 22px;
+            font-weight: bold;
+
+            box-shadow: 0px 0px 25px rgba(0,0,0,0.5);
+
+            transition: 0.4s;
+
+            z-index: 100;
+        }
+
+        #popup.show {
+
+            opacity: 1;
+        }
+
+        /* FOOTER */
+        .footer {
+
+            margin-top: 25px;
+            margin-bottom: 20px;
+
+            font-size: 16px;
+
+            opacity: 0.85;
+        }
+
+        /* FLOATING CHECKS */
+        .check {
+
+            position: fixed;
+
+            color: rgba(0,255,180,0.12);
+
+            animation: floatUp linear infinite;
+
+            z-index: 1;
+        }
+
+        @keyframes floatUp {
+
+            0%{
+                transform: translateY(100vh);
+                opacity:0;
+            }
+
+            20%{
+                opacity:1;
+            }
+
+            100%{
+                transform: translateY(-120vh);
+                opacity:0;
+            }
+        }
+
+        /* GLOW CIRCLES */
+        .glow {
+
+            position: fixed;
+
+            width: 350px;
+            height: 350px;
+
+            border-radius: 50%;
+
+            background: rgba(0,255,200,0.08);
+
+            filter: blur(5px);
+
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%{
+                transform:scale(0.8);
+            }
+
+            50%{
+                transform:scale(1.2);
+            }
+
+            100%{
+                transform:scale(0.8);
+            }
+        }
+
+        @media(max-width:768px){
+
+            .title{
+                font-size:32px;
+            }
+
+            .status{
+                font-size:18px;
+            }
+
+            .card{
+                padding:15px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Glow Effects -->
+    <div class="glow" style="top:10%; left:5%;"></div>
+    <div class="glow" style="bottom:5%; right:8%;"></div>
+
+    <!-- TITLE -->
+    <div class="title">
+        🎯 Smart Attendance System
+    </div>
+
+    <div class="subtitle">
+        AI-Based Face Recognition + Blink Detection
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="container">
+
+        <div class="card">
+
+            <div class="live-box">
+                <span class="live">● LIVE</span> Camera Feed
+            </div>
+
+            <div class="video-container">
+
+                <div class="loading" id="loading">
+                    📷 Connecting Camera...
+                </div>
+
+                <img
+                    src="{{ url_for('video_feed') }}"
+                    id="videoFeed"
+                    onload="hideLoading()"
+                >
+
+            </div>
+
+            <div class="status">
+                👁 Blink to verify & mark attendance
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- POPUP -->
+    <div id="popup"></div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Smart Attendance Dashboard © 2026
+    </div>
+
+    <!-- FLOATING CHECKMARKS -->
+    <script>
+
+        for(let i=0;i<20;i++){
+
+            let check = document.createElement("div");
+
+            check.className = "check";
+
+            check.innerHTML = "✔";
+
+            check.style.left = Math.random()*100 + "vw";
+
+            check.style.fontSize =
+                (20 + Math.random()*35) + "px";
+
+            check.style.animationDuration =
+                (5 + Math.random()*6) + "s";
+
+            document.body.appendChild(check);
+        }
+
+    </script>
+
+    <!-- CAMERA LOADING -->
+    <script>
+
+        function hideLoading(){
+
+            document.getElementById("loading").style.display = "none";
+        }
+
+    </script>
+
+    <!-- POPUP -->
+    <script>
+
+        function checkPopup(){
+
+            fetch('/check_popup')
+
+            .then(res => res.text())
+
+            .then(data => {
+
+                if(data !== "none"){
+
+                    let popup =
+                        document.getElementById("popup");
+
+                    popup.innerHTML =
+                        "✅ " + data + " marked present!";
+
+                    popup.classList.add("show");
+
+                    setTimeout(() => {
+
+                        popup.classList.remove("show");
+
+                    }, 3000);
+                }
+            });
+        }
+
+        setInterval(checkPopup, 2000);
+
+    </script>
+
+</body>
+
+</html>
